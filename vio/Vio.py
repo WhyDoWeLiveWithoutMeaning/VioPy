@@ -74,9 +74,9 @@ class ItemInstance:
     """
 
     def __init__(self, data: dict, item: str):
-        self.item = item
-        self.listings = ItemListings(data["listings"])
-        self.summary = ItemSummary(data["summary"])
+        self.item: str = item
+        self.listings: ItemListings = ItemListings(data["listings"])
+        self.summary: ItemSummary = ItemSummary(data["summary"])
 
     def __str__(self) -> str:
         table = self.summary._ascii_table() + self.listings._ascii_table()
@@ -103,7 +103,7 @@ class MarketInstance:
     """
 
     def __init__(self, data: dict) -> None:
-        self.id = data["_id"]
+        self.id: int = data["_id"]
         self.scan_info: ScanInfo = ScanInfo(data["data"]["scInfo"])
         self.items: Dict[str, ItemInstance] = {k: ItemInstance(v, k) for k, v in data["data"]["marketInfo"].items()}
 
