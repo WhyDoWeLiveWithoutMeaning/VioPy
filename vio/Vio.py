@@ -154,12 +154,13 @@ class AsyncVio:
     
     def __init__(self, key: str) -> None:
         self.key = key
-        self._ws_active = False
+        self._headers = {
+            "X-API-KEY": self.key,
+        }
 
-    async def init(self):
-        if not self._ws_active:
-            self._ws_active = True
-            self.ws = await websockets.connect(
-                "ws://adv.vi-o.tech/ws",
-                extra_headers=self.headers
-            )
+    async def current_market(self) -> MarketInstance:
+        res = requests.get(
+            f"{BASE_URI}/market",
+            headers=self._headers
+            ).json()
+        return MarketInstance(res)
