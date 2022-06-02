@@ -105,9 +105,7 @@ class MarketInstance:
     def __init__(self, data: dict) -> None:
         self.id = data["_id"]
         self.scan_info: ScanInfo = ScanInfo(data["data"]["scInfo"])
-        self.items: Dict[str, ItemInstance] = {}
-        for k, v in data["data"]["marketInfo"].items():
-            self.items[k] = ItemInstance(v, k)
+        self.items: Dict[str, ItemInstance] = {k: ItemInstance(v, k) for k, v in data["data"]["marketInfo"].items()}
 
     def __getattr__(self, item: str) -> Union[ItemInstance, None]:
         return self.items.get(item, None)
@@ -134,20 +132,18 @@ class Vio:
             "X-API-KEY": self.key,
         }
 
-        res = requests.get(
-            f"{BASE_URI}/market",
-            headers=self._headers
-            ).json()
-
-        self._latest_market = MarketInstance(res)
-
-    @property
     def current(self): 
         """Get the current market
 
         Returns:
             The current market.
         """
+        res = requests.get(
+            f"{BASE_URI}/market",
+            headers=self._headers
+            ).json()
+
+        self._latest_market = MarketInstance(res)
         return self._latest_market
 
 class AsyncVio:
@@ -158,9 +154,11 @@ class AsyncVio:
             "X-API-KEY": self.key,
         }
 
-    async def current_market(self) -> MarketInstance:
+    async def current(self) -> MarketInstance:
         res = requests.get(
             f"{BASE_URI}/market",
             headers=self._headers
             ).json()
-        return MarketInstance(res)
+
+        self._latest_market = MarketInstance(res)
+        return self._latest_market
