@@ -10,6 +10,7 @@ from typing import (
     Union,
     List,
     Dict,
+    Set
 )
 
 BASE_URI = "http://adv.vi-o.tech/api"
@@ -31,6 +32,8 @@ class ItemSummary:
             ["", "Sell Volume", "Sell Price", "Buy Volume", "Buy Price", ""],
             ["", self.sell_volume, self.sell_price, self.buy_volume, self.buy_price, ""]
         ]
+
+
 
 class Listing:
     """Listing Instance
@@ -147,12 +150,19 @@ class Vio:
         return self._latest_market
 
 class AsyncVio:
+    """AsyncVio Class
+
+    Represents an Asynchronous instance of the vio API, with a certain key.s
+    """
+
     
     def __init__(self, key: str) -> None:
         self.key = key
         self._headers = {
             "X-API-KEY": self.key,
         }
+
+        self._cached_market: Set[MarketInstance] = set()
 
     async def current(self) -> MarketInstance:
         res = requests.get(
@@ -161,4 +171,17 @@ class AsyncVio:
             ).json()
 
         self._latest_market = MarketInstance(res)
+
+        if self._latest_market not in self._cached_market:
+            self._cached_market.add(self._latest_market)
+        
         return self._latest_market
+
+    async def specific(self, item: int) -> MarketInstance:
+
+        res = requests.get(
+            f"{BASE_URI}/market/{item}",
+            headers=self._headers
+            ).json()
+
+        
