@@ -186,7 +186,7 @@ class Vio:
         res = httpx.get(
             f"{BASE_URI}/market/{item}",
             headers=self._headers
-            ).json()
+            )
 
         return [
             ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
