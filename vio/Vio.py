@@ -90,7 +90,7 @@ class ScanInfo:
 
     def __init__(self, data: dict):
         self.unix: int = data["capturedTime"]
-        self.datetime: datetime = data["datetimeSaved"]
+        self.datetime: datetime = datetime.fromtimestamp(self.unix)
 
     def __repr__(self) -> str:
         return f"<{self.__class__}({self.unix=},{self.datetime=})>"
