@@ -1,6 +1,7 @@
 import websockets
 import httpx
 import asyncio
+import json
 
 from datetime import datetime
 from terminaltables import AsciiTable
@@ -125,7 +126,7 @@ class MarketInstance:
     def __init__(self, data: dict) -> None:
         self.id: int = data["_id"]
         self.scan_info: ScanInfo = ScanInfo(data["data"]["scInfo"])
-        self.items: Dict[str, ItemInstance] = {k: ItemInstance(v, k) for k, v in data["data"]["marketInfo"].items()}
+        self.items: Dict[str, ItemInstance] = {k: ItemInstance(v, k, self.scan_info) for k, v in data["data"]["marketInfo"].items()}
 
     def __repr__(self) -> str:
         return f"<{self.__class__}({self.id=},{self.scan_info=},{self.items=})>"
@@ -184,7 +185,7 @@ class Vio:
             The history of the item.
         """
         res = httpx.get(
-            f"{BASE_URI}/market/{item}",
+            f"{BASE_URI}/item/{item}/all",
             headers=self._headers
             )
 
@@ -215,7 +216,7 @@ class AsyncVio:
                 headers=self._headers
                 )
 
-        self._latest_market = MarketInstance(res)
+        self._latest_market = MarketInstance(res.json())
         if self._latest_market not in self._cached_market:
             self._cached_market.add(self._latest_market)
         return self._latest_market
@@ -223,7 +224,7 @@ class AsyncVio:
     async def item_history(self, item: str) -> List[ItemInstance]:
         with httpx.AsyncClient() as client:
             res = await client.get(
-                f"{BASE_URI}/market/{item}/all",
+                f"{BASE_URI}/item/{item}/all",
                 headers=self._headers
                 )
 
