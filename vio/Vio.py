@@ -192,6 +192,8 @@ class AsyncVio:
                 )
 
         self._latest_market = MarketInstance(res)
+        if self._latest_market not in self._cached_market:
+            self._cached_market.add(self._latest_market)
         return self._latest_market
 
     async def item_history(self, item: str) -> List[MarketInstance]:
