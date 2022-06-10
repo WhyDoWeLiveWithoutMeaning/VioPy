@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
   name='Vio',
-  version='0.0.4',
+  version='0.0.5',
   description='A Wrapper for the Vio API',
   url='',
   author="Meaning",
@@ -10,7 +10,7 @@ setup(
   packages=['vio'],
   install_requires=[
     "websockets==10.3",
-    "requests==2.26.0",
+    "httpx==0.22.0",
     "terminaltables==3.1.10"
   ],
   classifiers=[
