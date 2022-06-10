@@ -154,6 +154,8 @@ class Vio:
         self._headers = {
             "X-API-KEY": self.key,
         }
+        
+        self._cached_market: Set[MarketInstance] = set()
 
     def current(self): 
         """Get the current market
@@ -167,7 +169,29 @@ class Vio:
             ).json()
 
         self._latest_market = MarketInstance(res)
+        if self._latest_market not in self._cached_market:
+            self._cached_market.add(self._latest_market)
+
         return self._latest_market
+
+    def item_history(self, item:str) -> List[ItemInstance]:
+        """Get the history of an item
+
+        Args:
+            item: The item to get the history of.
+
+        Returns:
+            The history of the item.
+        """
+        res = httpx.get(
+            f"{BASE_URI}/market/{item}",
+            headers=self._headers
+            ).json()
+
+        return [
+            ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
+            for i in res.json()
+        ]
 
 class AsyncVio:
     """AsyncVio Class
@@ -196,7 +220,7 @@ class AsyncVio:
             self._cached_market.add(self._latest_market)
         return self._latest_market
 
-    async def item_history(self, item: str) -> List[MarketInstance]:
+    async def item_history(self, item: str) -> List[ItemInstance]:
         with httpx.AsyncClient() as client:
             res = await client.get(
                 f"{BASE_URI}/market/{item}/all",
