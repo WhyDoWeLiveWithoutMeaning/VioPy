@@ -210,7 +210,7 @@ class AsyncVio:
         self._cached_market: Set[MarketInstance] = set()
 
     async def current(self) -> MarketInstance:
-        with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient() as client:
             res = await client.get(
                 f"{BASE_URI}/market",
                 headers=self._headers
@@ -222,7 +222,7 @@ class AsyncVio:
         return self._latest_market
 
     async def item_history(self, item: str) -> List[ItemInstance]:
-        with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient() as client:
             res = await client.get(
                 f"{BASE_URI}/item/{item}/all",
                 headers=self._headers
