@@ -141,3 +141,7 @@ async def market_autocomplete(interaction: discord.Interaction, current: str):
 
 client.run("BOT_TOKEN") # Replace with your Bot Token
 ```
+
+#### Output
+
+![Example of Command Being Run](https://i.imgur.com/YgXflIN.png)
