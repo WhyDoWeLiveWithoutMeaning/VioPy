@@ -65,3 +65,79 @@ print(sum(sell_prices)/len(sell_prices))
 ```
 3.518448940269686
 ```
+
+### Example of Discord Market Bot using VioWrapper
+
+#### Code
+```python
+import discord
+from discord import app_commands
+from discord.ext import commands
+
+from datetime import datetime
+
+from vio import AsyncVio
+
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+
+class TestBot(commands.Bot):
+    def __init__(self) -> None:
+        super().__init__(
+            command_prefix="!",
+            application_id=10000000000001, # Replace with your Application ID
+            intents=intents,
+            case_insensitive=True,
+    )
+
+    async def on_ready(self) -> None:
+        print(f"Bot is ready. It is currently in {len(self.guilds)} guilds.")
+
+    async def setup_hook(self) -> None:
+        await self.tree.sync()
+
+client = TestBot()
+vio = AsyncVio("Vio KEY") # Replace with your VIO Api Key
+
+def number_format(num):
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    # add more suffixes if you need them
+    return '%.2f%s' % (num, ['', 'K', 'M', 'G', 'T', 'P'][magnitude])
+
+@client.tree.command()
+async def market(interaction: discord.Interaction, item: str):
+    """Market Item Search
+    Get the Current Market Listings of a Specific Item
+    """
+
+    current_market = await vio.current()
+
+    market = current_market[item]
+
+
+    embed = discord.Embed(
+        title=f"{market.item} Market",
+        description=f"Scanned at: {discord.utils.format_dt(datetime.fromtimestamp(market.scan_info.unix), style='R')}",
+    )
+    embed.add_field(name="Best Sell Price", value=str(market.summary.sell_price), inline=True)
+    embed.add_field(name="Best Buy Price", value=str(market.summary.buy_price), inline=True)
+    embed.add_field(name="Market Volume", value=f'{number_format(market.summary.sell_volume)}/{number_format(market.summary.buy_volume)}', inline=True)
+    embed.add_field(name="Sell Orders", value="\n".join(f"{order.volume:,.0f} @ {order.price:,.2f} from {order.id}" for order in market.listings.sell), inline=False)
+    embed.add_field(name="Buy Orders", value="\n".join(f"{order.volume:,.0f} @ {order.price:,.2f} from {order.id}" for order in market.listings.buy))
+    await interaction.response.send_message(embed=embed)
+
+@market.autocomplete("item")
+async def market_autocomplete(interaction: discord.Interaction, current: str):
+    itemlist = [
+            app_commands.Choice(name=i, value=i)
+            for i in ["Korrelite", "Reknite", "Axnit", "RedNarcor", "Narcor", "Water", "Vexnium"] if i.lower().startswith(current.lower())
+        ]
+    return itemlist
+
+
+client.run("BOT_TOKEN") # Replace with your Bot Token
+```
