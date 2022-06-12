@@ -2,12 +2,14 @@ import websockets
 import httpx
 import asyncio
 import json
+import logging
 
 from datetime import datetime
 from terminaltables import AsciiTable
 from itertools import zip_longest
 
 from typing import (
+    Coroutine,
     Union,
     List,
     Dict,
@@ -15,6 +17,7 @@ from typing import (
 )
 
 BASE_URI = "http://adv.vi-o.tech/api"
+WS_URI = "ws://adv.vi-o.tech/ws"
 
 class ItemSummary:
     """Summary Instance
@@ -130,10 +133,7 @@ class MarketInstance:
 
     def __repr__(self) -> str:
         return f"<{self.__class__}({self.id=},{self.scan_info=},{self.items=})>"
-
-    def __getattr__(self, item: str) -> Union[ItemInstance, None]:
-        return self.items.get(item, None)
-
+    
     def __getitem__(self, item: str) -> Union[ItemInstance, None]:
         return self.items.get(item, None)
 
@@ -209,6 +209,9 @@ class AsyncVio:
 
         self._cached_market: Set[MarketInstance] = set()
 
+        self._listening: bool = False
+        self._coro_list: Set[Coroutine] = set()
+
     async def current(self) -> MarketInstance:
         async with httpx.AsyncClient() as client:
             res = await client.get(
@@ -232,3 +235,37 @@ class AsyncVio:
             ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
             for i in res.json()
         ]
+
+    async def listen(self) -> None:
+        """Listen for changes in the market
+
+        Returns:
+            Nothing.
+        """
+        if self._listening:
+            return
+
+        self._listening = True
+        async for socket in websockets.connect(WS_URI, extra_headers=self._headers):
+            try:
+                while True:
+                    res = await socket.recv()
+                    res = json.loads(res)
+                    if res["Rtype"] == "Update":
+                        instance = MarketInstance(res["DataType"])
+                        self._cached_market.add(instance)
+                        for coro in self._coro_list:
+                            await coro(instance)
+            except websockets.ConnectionClosed:
+                pass
+
+        
+    def event(self, coro):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("event must be a coroutine function")
+
+        self._coro_list.add(coro)
+        return coro
+        
+        
+        
