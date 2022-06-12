@@ -259,6 +259,16 @@ class AsyncVio:
             except websockets.ConnectionClosed:
                 pass
 
+    def run(self):
+        """Run the async vio instance
+
+        Returns:
+            Nothing.
+        """
+        try:
+            asyncio.run(self.listen())
+        except KeyboardInterrupt:
+            pass
         
     def event(self, coro):
         if not asyncio.iscoroutinefunction(coro):

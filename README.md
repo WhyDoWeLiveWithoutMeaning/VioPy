@@ -83,22 +83,24 @@ intents.members = True
 intents.presences = True
 
 class TestBot(commands.Bot):
-    def __init__(self) -> None:
+    def __init__(self, v) -> None:
         super().__init__(
             command_prefix="!",
             application_id=10000000000001, # Replace with your Application ID
             intents=intents,
             case_insensitive=True,
-    )
+            )
+        self.vio = v
 
     async def on_ready(self) -> None:
-        print(f"Bot is ready. It is currently in {len(self.guilds)} guilds.")
+        print("Bot is ready.")
+        await self.vio.listen() # Start listening for market data
 
     async def setup_hook(self) -> None:
         await self.tree.sync()
 
-client = TestBot()
-vio = AsyncVio("Vio KEY") # Replace with your VIO Api Key
+v = AsyncVio("Vio KEY") # Replace with your VIO Api Key
+client = TestBot(v)
 
 def number_format(num):
     magnitude = 0
@@ -108,17 +110,7 @@ def number_format(num):
     # add more suffixes if you need them
     return '%.2f%s' % (num, ['', 'K', 'M', 'G', 'T', 'P'][magnitude])
 
-@client.tree.command()
-async def market(interaction: discord.Interaction, item: str):
-    """Market Item Search
-    Get the Current Market Listings of a Specific Item
-    """
-
-    current_market = await vio.current()
-
-    market = current_market[item]
-
-
+def market_to_embed(market: MarketInstance):
     embed = discord.Embed(
         title=f"{market.item} Market",
         description=f"Scanned at: {discord.utils.format_dt(datetime.fromtimestamp(market.scan_info.unix), style='R')}",
@@ -128,6 +120,34 @@ async def market(interaction: discord.Interaction, item: str):
     embed.add_field(name="Market Volume", value=f'{number_format(market.summary.sell_volume)}/{number_format(market.summary.buy_volume)}', inline=True)
     embed.add_field(name="Sell Orders", value="\n".join(f"{order.volume:,.0f} @ {order.price:,.2f} from {order.id}" for order in market.listings.sell), inline=False)
     embed.add_field(name="Buy Orders", value="\n".join(f"{order.volume:,.0f} @ {order.price:,.2f} from {order.id}" for order in market.listings.buy))
+    return embed
+
+@client.vio.event
+async def on_market_update(market: MarketInstance):
+    channel = await client.fetch_channel(TEST_CHANNEL) # Replace with your channel ID
+
+    # Process ItemInstance to an embed
+    embed = market_to_embed(market["Korrelite"])
+
+    # Send the embed to the channel
+    await channel.send(embed=embed)
+
+@client.tree.command()
+async def market(interaction: discord.Interaction, item: str):
+    """Market Item Search
+    Get the Current Market Listings of a Specific Item
+    """
+
+    # Get the current Market
+    current_market = await v.current()
+
+    # Get the item requested from the market
+    market = current_market[item]
+
+    # Process the ItemMarket instance into an embed
+    embed = market_to_embed(market)
+
+    # Send the embed to the user
     await interaction.response.send_message(embed=embed)
 
 @market.autocomplete("item")
