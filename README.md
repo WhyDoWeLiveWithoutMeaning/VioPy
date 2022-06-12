@@ -1,11 +1,11 @@
 # VIO API Wrapper
 
-##Simple to install 
+## Simple to install 
 simply do
 `pip install git+https://github.com/WhyDoWeLiveWithoutMeaning/VioWrapper`
 
 
-##Examples
+## Examples
 
 ### Getting the Current Market
 
