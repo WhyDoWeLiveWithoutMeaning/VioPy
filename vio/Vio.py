@@ -403,16 +403,7 @@ class AsyncVio:
             pass
         
     def event(self, coro: Coroutine) -> Coroutine:
-        """A decorator that registers a coroutine to be called when new market data is received.
-
-        Example
-        -------
-        .. code-block:: python3
-            @vio.event
-            async def print_market(market: MarketInstance):
-                print(market["Korrelite"])
-        
-        """
+        """A decorator that registers a coroutine to be called when new market data is received."""
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("event must be a coroutine function")
 
