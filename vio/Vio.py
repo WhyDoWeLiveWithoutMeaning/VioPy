@@ -371,12 +371,14 @@ class AsyncVio:
         ]
 
     async def listen(self) -> None:
-        """|coro|
-
+        """
         Creates a websocket connection and lets the websocket listen to 
         messages from VIO. This will run forever.
 
         """
+        if self._listening.locked():
+            return
+
         async with self._listening:
             async for socket in websockets.connect(WS_URI, extra_headers=self._headers):
                 try:

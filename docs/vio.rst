@@ -16,7 +16,6 @@ Vio
 
 .. autoclass:: Vio
    :members:
-   :undoc-members:
 
 AsyncVio
 ~~~~~~~~~
@@ -25,10 +24,6 @@ AsyncVio
 
 .. autoclass:: AsyncVio
    :members:
-   :exclude-members: event
-
-   .. automethod:: AsyncVio.event()
-      :decorator:
 
 Objects
 -------
