@@ -2,7 +2,6 @@ import websockets
 import httpx
 import asyncio
 import json
-import logging
 
 from datetime import datetime
 from terminaltables import AsciiTable
@@ -328,7 +327,7 @@ class AsyncVio:
 
         self._cached_market: Set[MarketInstance] = set()
 
-        self._listening: bool = False
+        self._listening: asyncio.Lock = asyncio.Lock()
         self._coro_list: Set[Coroutine] = set()
 
     async def current(self) -> MarketInstance:
@@ -378,22 +377,18 @@ class AsyncVio:
         messages from VIO. This will run forever.
 
         """
-        if self._listening:
-            return
-
-        self._listening = True
-        async for socket in websockets.connect(WS_URI, extra_headers=self._headers):
-            try:
-                while True:
-                    res = await socket.recv()
-                    res = json.loads(res)
-                    if res["Rtype"] == "Update":
-                        instance = MarketInstance(res["DataType"])
-                        self._cached_market.add(instance)
-                        for coro in self._coro_list:
-                            await coro(instance)
-            except websockets.ConnectionClosed:
-                pass
+        async with self._listening:
+            async for socket in websockets.connect(WS_URI, extra_headers=self._headers):
+                try:
+                    while True:
+                        res = await socket.recv()
+                        res = json.loads(res)
+                        if res["Rtype"] == "Update":
+                            instance = MarketInstance(res["DataType"])
+                            self._cached_market.add(instance)
+                            await asyncio.gather(*[coro(instance) for coro in self._coro_list])
+                except websockets.ConnectionClosed:
+                    pass
 
     def run(self) -> None:
         """A blocking call that runs the listen coroutine.
