@@ -30,10 +30,13 @@ AsyncVio
    .. automethod:: AsyncVio.event()
       :decorator:
 
-vio module
---------------
+Objects
+-------
 
-.. automodule:: vio
+MarketInstance
+~~~~~~~~~~~~~~
+
+.. atributetable:: MarketInstance
+
+.. autoclass:: MarketInstance
    :members:
-   :undoc-members:
-   :show-inheritance:
