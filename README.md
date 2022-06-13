@@ -4,6 +4,9 @@
 simply do
 `pip install git+https://github.com/WhyDoWeLiveWithoutMeaning/VioWrapper`
 
+## Documentation
+
+Click [here](https://viowrapper.rtfd.io) to read the documentation
 
 ## Examples
 
