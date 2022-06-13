@@ -16,6 +16,8 @@ from typing import (
     Set
 )
 
+from yaml import Mark
+
 BASE_URI = "http://adv.vi-o.tech/api"
 WS_URI = "ws://adv.vi-o.tech/ws"
 
@@ -121,9 +123,12 @@ class ItemInstance:
         return "\n".join(str_tab)
 
 class MarketInstance:
-    """Market Instance
+    """Represents one instance of the market
 
-    Represents one instance of the market
+    Parameters:
+        data: :class:`dict`
+            The data of the market.
+
     """
 
     def __init__(self, data: dict) -> None:
@@ -158,11 +163,10 @@ class Vio:
         
         self._cached_market: Set[MarketInstance] = set()
 
-    def current(self): 
+    def current(self) -> MarketInstance: 
         """Get the current market
 
-        Returns:
-            The current market.
+        :return: The current market.
         """
         res = httpx.get(
             f"{BASE_URI}/market",
@@ -176,13 +180,10 @@ class Vio:
         return self._latest_market
 
     def item_history(self, item:str) -> List[ItemInstance]:
-        """Get the history of an item
+        """Get the entire scan history of an Item
 
-        Args:
-            item: The item to get the history of.
-
-        Returns:
-            The history of the item.
+        :param item: The item to get the history of.
+        :return: The history of the item.
         """
         res = httpx.get(
             f"{BASE_URI}/item/{item}/all",
@@ -197,7 +198,11 @@ class Vio:
 class AsyncVio:
     """AsyncVio Class
 
-    Represents an Asynchronous instance of the vio API, with a certain key.s
+    Represents an Asynchronous instance of the vio API, with a certain key.
+
+    Parameters:
+        key: :class:`str` 
+            The API key to use.
     """
 
     
@@ -213,6 +218,10 @@ class AsyncVio:
         self._coro_list: Set[Coroutine] = set()
 
     async def current(self) -> MarketInstance:
+        """Get the current market
+
+        :return: The current market.
+        """
         async with httpx.AsyncClient() as client:
             res = await client.get(
                 f"{BASE_URI}/market",
@@ -225,6 +234,11 @@ class AsyncVio:
         return self._latest_market
 
     async def item_history(self, item: str) -> List[ItemInstance]:
+        """Get the entire scan history of an Item
+
+        :param item: The item to get the history of.
+        :return: The history of the item.
+        """
         async with httpx.AsyncClient() as client:
             res = await client.get(
                 f"{BASE_URI}/item/{item}/all",
@@ -238,9 +252,6 @@ class AsyncVio:
 
     async def listen(self) -> None:
         """Listen for changes in the market
-
-        Returns:
-            Nothing.
         """
         if self._listening:
             return
@@ -259,7 +270,7 @@ class AsyncVio:
             except websockets.ConnectionClosed:
                 pass
 
-    def run(self):
+    def run(self) -> None:
         """Run the async vio instance
 
         Returns:
@@ -270,7 +281,7 @@ class AsyncVio:
         except KeyboardInterrupt:
             pass
         
-    def event(self, coro):
+    def event(self, coro: Coroutine) -> Coroutine:
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("event must be a coroutine function")
 
