@@ -18,7 +18,7 @@ sys.path.append(os.path.abspath('extensions'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'VioWrapper'
+project = 'VioPy'
 copyright = '2022, Meaning'
 author = 'Meaning'
 
