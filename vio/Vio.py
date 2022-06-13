@@ -407,7 +407,7 @@ class AsyncVio:
 
         Example
         -------
-        .. code-block:: python
+        .. code-block:: python3
             @vio.event
             async def print_market(market: MarketInstance):
                 print(market["Korrelite"])
