@@ -10,5 +10,5 @@ Registering an event
 .. code-block:: python3
 
     @vio.event
-    async def print_market(market: MarketInstance):
+    async def print_market(market: :class:`MarketInstance`):
         print(market["Korrelite"])
