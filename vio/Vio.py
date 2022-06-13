@@ -1,9 +1,10 @@
+from time import time
 import websockets
 import httpx
 import asyncio
 import json
 
-from datetime import datetime
+from datetime import datetime, timezone
 from terminaltables import AsciiTable
 from itertools import zip_longest
 
@@ -155,7 +156,7 @@ class ScanInfo:
 
     def __init__(self, data: dict):
         self._unix: int = data["capturedTime"]
-        self._datetime: datetime = datetime.fromtimestamp(self.unix)
+        self._datetime: datetime = datetime.strptime(data["datetimeSaved"]["$date"], "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
 
     def __repr__(self) -> str:
         return f"<{self.__class__}({self._unix=},{self._datetime=})>"
@@ -164,6 +165,11 @@ class ScanInfo:
     def unix(self) -> int:
         """:class:`int`: The UNIX timestamp of the scan."""
         return self._unix
+
+    @property
+    def unix_datetime(self) -> datetime:
+        """:class:`datetime`: The datetime of the scan created from the UNIX timestamp."""
+        return datetime.fromtimestamp(self.unix, timezone.utc)
 
     @property
     def datetime(self) -> datetime:
@@ -291,6 +297,42 @@ class Vio:
 
         return self._latest_market
 
+    def market_scan(self, id: int) -> MarketInstance:
+        """Get a market scan from a previous date.
+
+        Returns
+        -------
+            :class:`MarketInstance`
+        """
+
+        res = httpx.get(
+            f"{BASE_URI}/market/{id}",
+            headers=self._headers
+            ).json()
+
+        market = MarketInstance(res)
+
+        if market not in self._cached_market:
+            self._cached_market.add(market)
+
+        return market
+
+    def scan_history(self) -> Dict[datetime, int]:
+        """Get a dictionary of Datetimes to ints of the scan history.
+
+        Returns
+        -------
+            Dict[:class:`datetime`, :class:`int`]
+        :return: A dictionary of Datetimes to ints of the scan history.
+        """
+        res = httpx.get(
+            f"{BASE_URI}/market/history",
+            headers=self._headers
+            ).json()
+
+        return {datetime.fromisoformat(k): v for k, v in res.items()}
+        
+
     def item_history(self, item:str) -> List[ItemInstance]:
         """Get the entire scan history of an Item
 
@@ -330,6 +372,8 @@ class AsyncVio:
         self._listening: asyncio.Lock = asyncio.Lock()
         self._coro_list: Set[Coroutine] = set()
 
+    ## MARKET
+
     async def current(self) -> MarketInstance:
         """Get the current market
 
@@ -347,6 +391,45 @@ class AsyncVio:
         if self._latest_market not in self._cached_market:
             self._cached_market.add(self._latest_market)
         return self._latest_market
+
+    async def market_scan(self, id: int) -> MarketInstance:
+        """Get a market scan from a previous date.
+
+        Returns
+        -------
+            :class:`MarketInstance`
+        """
+
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                f"{BASE_URI}/market/{id}",
+                headers=self._headers
+                )
+
+        market = MarketInstance(res.json())
+
+        if market not in self._cached_market:
+            self._cached_market.add(market)
+
+        return market
+
+    async def scan_history(self) -> Dict[datetime, int]:
+        """Get a dictionary of Datetimes to ints of the scan history.
+
+        Returns
+        -------
+            Dict[:class:`datetime`, :class:`int`]
+        :return: A dictionary of Datetimes to ints of the scan history.
+        """
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                f"{BASE_URI}/market/history",
+                headers=self._headers
+                )
+
+        return {datetime.fromisoformat(k): v for k, v in res.items()}
+
+    ## ITEMS
 
     async def item_history(self, item: str) -> List[ItemInstance]:
         """Get the entire scan history of an Item
@@ -369,6 +452,8 @@ class AsyncVio:
             ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
             for i in res.json()
         ]
+
+    ## WS
 
     async def listen(self) -> None:
         """
@@ -403,7 +488,17 @@ class AsyncVio:
             pass
         
     def event(self, coro: Coroutine) -> Coroutine:
-        """A decorator that registers a coroutine to be called when new market data is received."""
+        """A decorator that registers a coroutine to be called when new market data is received.
+        
+        Example
+        -------
+
+        .. code-block:: python3
+
+            @vio.event
+            async def print_market(market: MarketInstance):
+                print(market["Korrelite"])
+        """
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("event must be a coroutine function")
 
