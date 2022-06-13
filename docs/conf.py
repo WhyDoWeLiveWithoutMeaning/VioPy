@@ -32,12 +32,9 @@ extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
-    'sphinxcontrib_trio',
     'details',
     'exception_hierarchy',
-    'attributetable',
-    'resourcelinks',
-    'nitpick_file_ignorer',
+    'attributetable'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
