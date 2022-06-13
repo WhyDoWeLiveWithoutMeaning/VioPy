@@ -36,7 +36,47 @@ Objects
 MarketInstance
 ~~~~~~~~~~~~~~
 
-.. atributetable:: MarketInstance
+.. attributetable:: MarketInstance
 
 .. autoclass:: MarketInstance
+   :members:
+
+ItemInstance
+~~~~~~~~~~~~~
+
+.. attributetable:: ItemInstance
+
+.. autoclass:: ItemInstance
+   :members:
+
+ItemListing
+~~~~~~~~~~~~
+
+.. attributetable:: ItemListing
+
+.. autoclass:: ItemListing
+   :members:
+
+ItemSummary
+~~~~~~~~~~~~
+
+.. attributetable:: ItemSummary
+
+.. autoclass:: ItemSummary
+   :members:
+
+ScanInfo
+~~~~~~~~~
+
+.. attributetable:: ScanInfo
+
+.. autoclass:: ScanInfo
+   :members:
+
+Listing
+~~~~~~~
+
+.. attributetable:: Listing
+
+.. autoclass:: Listing
    :members:
