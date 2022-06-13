@@ -20,9 +20,12 @@ BASE_URI = "http://adv.vi-o.tech/api"
 WS_URI = "ws://adv.vi-o.tech/ws"
 
 class ItemSummary:
-    """Summary Instance
+    """Represents the instance of an item summary.
 
-    Represents the instance of the summary of an Item
+    Parameters
+    ----------
+        data: :class:`dict`
+            The data of the summary.
     """
 
     def __init__(self, data: dict) -> None:
