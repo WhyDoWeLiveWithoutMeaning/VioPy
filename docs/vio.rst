@@ -1,5 +1,4 @@
-vio package
-===========
+.. currentmodule:: Vio
 
 Submodules
 ----------
