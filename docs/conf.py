@@ -28,7 +28,17 @@ author = 'Meaning'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc"
+    'builder',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
+    'sphinxcontrib_trio',
+    'details',
+    'exception_hierarchy',
+    'attributetable',
+    'resourcelinks',
+    'nitpick_file_ignorer',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
