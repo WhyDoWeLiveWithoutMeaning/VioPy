@@ -1,13 +1,13 @@
-vio package
+The Vio Wrapper reference
 ===========
 
 Submodules
 ----------
 
-vio.Vio module
+vio module
 --------------
 
-.. automodule:: vio.Vio
+.. automodule:: vio
    :members:
    :undoc-members:
    :show-inheritance:
