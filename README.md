@@ -2,11 +2,11 @@
 
 ## Simple to install 
 simply do
-`pip install git+https://github.com/WhyDoWeLiveWithoutMeaning/VioWrapper`
+`pip install git+https://github.com/WhyDoWeLiveWithoutMeaning/VioPy`
 
 ## Documentation
 
-Click [here](https://viowrapper.rtfd.io) to read the documentation
+Click [here](https://viopy.rtfd.io) to read the documentation
 
 ## Examples
 
