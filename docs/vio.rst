@@ -49,12 +49,12 @@ ItemInstance
 .. autoclass:: ItemInstance
    :members:
 
-ItemListing
+ItemListings
 ~~~~~~~~~~~~
 
-.. attributetable:: ItemListing
+.. attributetable:: ItemListings
 
-.. autoclass:: ItemListing
+.. autoclass:: ItemListings
    :members:
 
 ItemSummary
