@@ -15,9 +15,7 @@ setup(
   ],
   classifiers=[
     'Development Status :: 1 - Planning',
-    'Intended Audience :: WEBSITE USERS',
     'License :: OSI Approved :: MIT License',  
-    'Operating System :: WINDOWS',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
