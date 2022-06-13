@@ -16,8 +16,6 @@ from typing import (
     Set
 )
 
-from yaml import Mark
-
 BASE_URI = "http://adv.vi-o.tech/api"
 WS_URI = "ws://adv.vi-o.tech/ws"
 
