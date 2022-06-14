@@ -29,6 +29,7 @@ import asyncio
 import json
 
 from datetime import datetime, timezone
+from ratelimiter import RateLimiter
 from terminaltables import AsciiTable
 from itertools import zip_longest
 
@@ -42,6 +43,7 @@ from typing import (
 
 BASE_URI = "http://adv.vi-o.tech/api"
 WS_URI = "ws://adv.vi-o.tech/ws"
+RATE_LIMITER = RateLimiter(60, 60)
 
 class ItemSummary:
     """Represents the instance of an item summary.
@@ -310,16 +312,18 @@ class Vio:
 
         :return: The current market.
         """
-        res = httpx.get(
-            f"{BASE_URI}/market",
-            headers=self._headers
-            ).json()
 
-        self._latest_market = MarketInstance(res)
-        if self._latest_market not in self._cached_market:
-            self._cached_market.add(self._latest_market)
+        with RATE_LIMITER:
+            res = httpx.get(
+                f"{BASE_URI}/market",
+                headers=self._headers
+                ).json()
 
-        return self._latest_market
+            self._latest_market = MarketInstance(res)
+            if self._latest_market not in self._cached_market:
+                self._cached_market.add(self._latest_market)
+
+            return self._latest_market
 
     def market_scan(self, id: int) -> MarketInstance:
         """Get a market scan from a previous date.
@@ -329,17 +333,18 @@ class Vio:
             :class:`MarketInstance`
         """
 
-        res = httpx.get(
-            f"{BASE_URI}/market/{id}",
-            headers=self._headers
-            ).json()
+        with RATE_LIMITER:
+            res = httpx.get(
+                f"{BASE_URI}/market/{id}",
+                headers=self._headers
+                ).json()
 
-        market = MarketInstance(res)
+            market = MarketInstance(res)
 
-        if market not in self._cached_market:
-            self._cached_market.add(market)
+            if market not in self._cached_market:
+                self._cached_market.add(market)
 
-        return market
+            return market
 
     def scan_history(self) -> Dict[datetime, int]:
         """Get a dictionary of Datetimes to ints of the scan history.
@@ -349,12 +354,14 @@ class Vio:
             Dict[:class:`datetime`, :class:`int`]
         :return: A dictionary of Datetimes to ints of the scan history.
         """
-        res = httpx.get(
-            f"{BASE_URI}/market/history",
-            headers=self._headers
-            ).json()
 
-        return {datetime.fromisoformat(k): v for k, v in res.items()}
+        with RATE_LIMITER:
+            res = httpx.get(
+                f"{BASE_URI}/market/history",
+                headers=self._headers
+                ).json()
+
+            return {datetime.fromisoformat(k): v for k, v in res.items()}
         
 
     def item_history(self, item:str) -> List[ItemInstance]:
@@ -363,15 +370,17 @@ class Vio:
         :param item: The item to get the history of.
         :return: The history of the item.
         """
-        res = httpx.get(
-            f"{BASE_URI}/item/{item}/all",
-            headers=self._headers
-            )
 
-        return [
-            ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
-            for i in res.json()
-        ]
+        with RATE_LIMITER:
+            res = httpx.get(
+                f"{BASE_URI}/item/{item}/all",
+                headers=self._headers
+                )
+
+            return [
+                ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
+                for i in res.json()
+            ]
 
 class AsyncVio:
     """AsyncVio Class
@@ -405,16 +414,18 @@ class AsyncVio:
         -------
             :class:`MarketInstance`
         """
-        async with httpx.AsyncClient() as client:
-            res = await client.get(
-                f"{BASE_URI}/market",
-                headers=self._headers
-                )
 
-        self._latest_market = MarketInstance(res.json())
-        if self._latest_market not in self._cached_market:
-            self._cached_market.add(self._latest_market)
-        return self._latest_market
+        async with RATE_LIMITER:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    f"{BASE_URI}/market",
+                    headers=self._headers
+                    )
+
+            self._latest_market = MarketInstance(res.json())
+            if self._latest_market not in self._cached_market:
+                self._cached_market.add(self._latest_market)
+            return self._latest_market
 
     async def market_scan(self, id: int) -> MarketInstance:
         """Get a market scan from a previous date.
@@ -424,18 +435,19 @@ class AsyncVio:
             :class:`MarketInstance`
         """
 
-        async with httpx.AsyncClient() as client:
-            res = await client.get(
-                f"{BASE_URI}/market/{id}",
-                headers=self._headers
-                )
+        async with RATE_LIMITER:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    f"{BASE_URI}/market/{id}",
+                    headers=self._headers
+                    )
 
-        market = MarketInstance(res.json())
+            market = MarketInstance(res.json())
 
-        if market not in self._cached_market:
-            self._cached_market.add(market)
+            if market not in self._cached_market:
+                self._cached_market.add(market)
 
-        return market
+            return market
 
     async def scan_history(self) -> Dict[datetime, int]:
         """Get a dictionary of Datetimes to ints of the scan history.
@@ -445,13 +457,14 @@ class AsyncVio:
             Dict[:class:`datetime`, :class:`int`]
         :return: A dictionary of Datetimes to ints of the scan history.
         """
-        async with httpx.AsyncClient() as client:
-            res = await client.get(
-                f"{BASE_URI}/market/history",
-                headers=self._headers
-                )
+        async with RATE_LIMITER:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    f"{BASE_URI}/market/history",
+                    headers=self._headers
+                    )
 
-        return {datetime.fromisoformat(k): v for k, v in res.items()}
+            return {datetime.fromisoformat(k): v for k, v in res.items()}
 
     ## ITEMS
 
@@ -466,16 +479,17 @@ class AsyncVio:
         -------
             :class:`List[ItemInstance]`
         """
-        async with httpx.AsyncClient() as client:
-            res = await client.get(
-                f"{BASE_URI}/item/{item}/all",
-                headers=self._headers
-                )
+        async with RATE_LIMITER:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    f"{BASE_URI}/item/{item}/all",
+                    headers=self._headers
+                    )
 
-        return [
-            ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
-            for i in res.json()
-        ]
+            return [
+                ItemInstance(i["data"]["marketInfo"][item], item, ScanInfo(i["data"]["scInfo"])) 
+                for i in res.json()
+            ]
 
     ## WS
 
