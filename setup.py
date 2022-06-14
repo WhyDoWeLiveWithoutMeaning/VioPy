@@ -16,8 +16,7 @@ setup(
   install_requires=[
     "websockets==10.3",
     "httpx==0.22.0",
-    "terminaltables==3.1.10",
-    "ratelimiter==1.2.0.post0"
+    "terminaltables==3.1.10"
   ],
   classifiers=[
     'Development Status :: 1 - Planning',
