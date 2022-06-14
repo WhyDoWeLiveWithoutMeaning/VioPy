@@ -64,10 +64,9 @@ Let's make it print average the best buy price of Korrelite in the market
 and let's also subscribe to the websocket event to get real-time data.
 
 .. code-block:: python3
-    import asyncio
 
-    # import AsyncVio and also the MarketInstance Object
-    from vio import AsyncVio, MarketInstance
+    import asyncio
+    from vio import AsyncVio, MarketInstance # import AsyncVio and also the MarketInstance Object
 
     # Initializing the Vio Object
     v = AsyncVio("Your API Key")
