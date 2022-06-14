@@ -24,7 +24,7 @@ Installing VioPy
 ~~~~~~~~~~~~~~~~~
 
 You can install VioPy by using the following command:
-``pip install git+https://github.com/WhyDoWeLiveWithoutMeaning/VioPy``
+``pip install vio``
 
 Basic Program
 ~~~~~~~~~~~~~~
