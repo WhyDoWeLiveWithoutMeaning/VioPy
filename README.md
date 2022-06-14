@@ -2,7 +2,7 @@
 
 ## Simple to install 
 simply do
-`pip install git+https://github.com/WhyDoWeLiveWithoutMeaning/VioPy`
+`pip install viopy`
 
 ## Documentation
 
