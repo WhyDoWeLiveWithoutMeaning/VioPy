@@ -89,7 +89,7 @@ and let's also subscribe to the websocket event to get real-time data.
         # Getting every scan of Korrelite
         korrelite_history = await v.item_history("Korrelite")
 
-        # Using a Generator to put all the prices in a list
+        # Using a loop to put all the prices in a list
         prices = [instance.summary.buy_price for instance in korrelite_history]
 
         # Calculating the average price
