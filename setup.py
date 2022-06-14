@@ -1,11 +1,16 @@
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
   name='VioPy',
   version='0.0.9',
   description='A Wrapper for the Vio API',
   url='http://adv.vi-o.tech/api',
   author="Meaning",
+  long_description=long_description,
+  long_description_content_type="text/markdown",
   license="MIT",
   packages=['vio'],
   install_requires=[
