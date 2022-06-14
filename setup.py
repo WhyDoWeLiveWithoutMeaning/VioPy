@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-  name='Vio',
+  name='VioPy',
   version='0.0.9',
   description='A Wrapper for the Vio API',
   url='http://adv.vi-o.tech/api',
