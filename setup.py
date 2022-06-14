@@ -1,11 +1,20 @@
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
   name='Vio',
-  version='0.0.9',
+  version='0.0.12',
   description='A Wrapper for the Vio API',
+<<<<<<< HEAD
   url='https://viopy.readthedocs.io/',
+=======
+  url='https://viopy.rtfd.io',
+>>>>>>> e5ccc656d279e6c05d25e7f44c1ea7eff356269b
   author="Meaning",
+  long_description=long_description,
+  long_description_content_type="text/markdown",
   license="MIT",
   packages=['vio'],
   install_requires=[
@@ -15,9 +24,7 @@ setup(
   ],
   classifiers=[
     'Development Status :: 1 - Planning',
-    'Intended Audience :: WEBSITE USERS',
     'License :: OSI Approved :: MIT License',  
-    'Operating System :: WINDOWS',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
