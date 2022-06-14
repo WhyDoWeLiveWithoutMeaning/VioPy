@@ -4,7 +4,7 @@ setup(
   name='Vio',
   version='0.0.9',
   description='A Wrapper for the Vio API',
-  url='http://adv.vi-o.tech/api',
+  url='https://viopy.readthedocs.io/',
   author="Meaning",
   license="MIT",
   packages=['vio'],
