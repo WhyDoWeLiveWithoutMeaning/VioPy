@@ -2,7 +2,7 @@
 
 ## Simple to install 
 simply do
-`pip install viopy`
+`pip install vio`
 
 ## Documentation
 

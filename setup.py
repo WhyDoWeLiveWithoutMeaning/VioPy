@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
   name='Vio',
-  version='0.0.11',
+  version='0.0.12',
   description='A Wrapper for the Vio API',
   url='https://viopy.rtfd.io',
   author="Meaning",
