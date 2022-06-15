@@ -75,3 +75,11 @@ Listing
 
 .. autoclass:: Listing
    :members:
+
+RobloxUser
+~~~~~~~~~~~
+
+.. attributetable:: RobloxUser
+
+.. autoclass:: RobloxUser
+   :members:
