@@ -7,7 +7,7 @@ setup(
   name='Vio',
   version='0.0.12',
   description='A Wrapper for the Vio API',
-  url='https://viopy.rtfd.io',
+  url='https://viopy.readthedocs.io/',
   author="Meaning",
   long_description=long_description,
   long_description_content_type="text/markdown",

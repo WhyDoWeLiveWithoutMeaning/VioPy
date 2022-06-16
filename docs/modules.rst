@@ -1,8 +1,8 @@
-vio
-===
+Welcome to VioPy!
+==================
 
-.. toctree::
-   :maxdepth: 4
+.. toctree:: 
+   :maxdepth: 1
 
    intro
    vio
